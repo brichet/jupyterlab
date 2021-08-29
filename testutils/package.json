@@ -25,10 +25,10 @@
     "tsconfigtestbase.json"
   ],
   "scripts": {
-    "build": "tsc -b",
+    "build": "yarn run tsc -b",
     "build:all": "npm run build",
-    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
-    "watch": "tsc -b --watch"
+    "clean": "yarn run rimraf lib && yarn run rimraf tsconfig.tsbuildinfo",
+    "watch": "yarn run tsc -b --watch"
   },
   "dependencies": {
     "@jupyterlab/application": "^4.0.0-alpha.18",
