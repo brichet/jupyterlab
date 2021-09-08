@@ -31,20 +31,20 @@
   "scripts": {
     "build": "npm run clean && npm run build:galata && npm run build:inpage",
     "build:all": "npm run build",
-    "build:galata": "tsc -b",
-    "build:inpage": "webpack --mode=production",
-    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "build:galata": "jlpm run tsc -b",
+    "build:inpage": "jlpm run webpack --mode=production",
+    "clean": "jlpm run rimraf lib tsconfig.tsbuildinfo",
     "start": "jupyter lab --config ./jupyter_server_test_config.py",
     "start:detached": "(npm run start&)",
     "start:doc": "PYTHONWARNINGS=ignore jupyter lab --config ./jupyter_server_test_config.py --extensions-in-dev-mode",
     "test": "playwright test",
     "test:benchmark": "jlpm run test -c playwright-benchmark.config.js",
     "test:benchmark:update": "BENCHMARK_NUMBER_SAMPLES=1 jlpm run test -c playwright-benchmark.config.js --update-snapshots",
-    "test:debug": "PWDEBUG=1 playwright test",
+    "test:debug": "PWDEBUG=1 jlpm run playwright test",
     "test:doc": "jlpm run test -c playwright-documentation.config.js",
     "test:doc:update": "jlpm run test -c playwright-documentation.config.js --update-snapshots",
-    "test:report": "playwright show-report",
-    "test:update": "playwright test --update-snapshots && jlpm test:benchmark:update"
+    "test:report": "jlpm run playwright show-report",
+    "test:update": "jlpm run playwright test --update-snapshots && jlpm test:benchmark:update"
   },
   "dependencies": {
     "@jupyterlab/application": "^4.0.0-alpha.18",
