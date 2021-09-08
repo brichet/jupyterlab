@@ -29,8 +29,8 @@
     "style/index.js"
   ],
   "scripts": {
-    "build": "npm run clean && npm run build:galata && npm run build:inpage",
-    "build:all": "npm run build",
+    "build": "$npm_execpath run clean && $npm_execpath run build:galata && $npm_execpath run build:inpage",
+    "build:all": "$npm_execpath run build",
     "build:galata": "jlpm run tsc -b",
     "build:inpage": "jlpm run webpack --mode=production",
     "clean": "jlpm run rimraf lib tsconfig.tsbuildinfo",
