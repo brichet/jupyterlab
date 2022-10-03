@@ -69,7 +69,9 @@
     "@lumino/coreutils": "^2.0.0-beta.0",
     "@lumino/disposable": "^2.0.0-beta.1",
     "@lumino/messaging": "^2.0.0-beta.0",
-    "@lumino/widgets": "^2.0.0-beta.1"
+    "@lumino/widgets": "^2.0.0-beta.1",
+    "@rjsf/core": "^4.2.0",
+    "react": "^17.0.1"
   },
   "devDependencies": {
     "rimraf": "~3.0.0",
