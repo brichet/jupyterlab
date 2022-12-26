@@ -857,9 +857,10 @@ const updateRawMimetype: JupyterFrontEndPlugin<void> = {
     translator: ITranslator
   ) => {
     const trans = translator.load('jupyterlab');
-    if (metadataForms.commonTools) {
-      const properties =
-        metadataForms.commonTools.getProperties('/raw_mimetype');
+    if (metadataForms.get('commonTools')) {
+      const properties = metadataForms
+        .get('commonTools')!
+        .getProperties('/raw_mimetype');
       if (!properties) return;
 
       const services = app.serviceManager;
@@ -879,7 +880,9 @@ const updateRawMimetype: JupyterFrontEndPlugin<void> = {
             }
           });
         }
-        metadataForms.commonTools.setProperties('/raw_mimetype', properties);
+        metadataForms
+          .get('commonTools')!
+          .setProperties('/raw_mimetype', properties);
       });
     }
   }
