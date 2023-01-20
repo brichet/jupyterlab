@@ -4,16 +4,16 @@
   "private": true,
   "license": "BSD-3-Clause",
   "scripts": {
-    "build": "jlpm run clean && jlpm run webpack",
-    "build:dev": "jlpm run build",
-    "build:prod": "jlpm run webpack --config webpack.prod.config.js",
-    "build:prod:minimize": "jlpm run webpack --config webpack.prod.minimize.config.js",
-    "build:prod:release": "jlpm run webpack --config webpack.prod.release.config.js",
-    "build:prod:stats": "jlpm run webpack --profile --config webpack.prod.minimize.config.js --json > stats.json",
-    "build:stats": "jlpm run webpack --profile --json > stats.json",
-    "clean": "jlpm run rimraf build",
-    "prepublishOnly": "jlpm run build",
-    "watch": "jlpm run webpack --watch"
+    "build": "$npm_execpath run clean && webpack",
+    "build:dev": "$npm_execpath run build",
+    "build:prod": "webpack --config webpack.prod.config.js",
+    "build:prod:minimize": "webpack --config webpack.prod.minimize.config.js",
+    "build:prod:release": "webpack --config webpack.prod.release.config.js",
+    "build:prod:stats": "webpack --profile --config webpack.prod.minimize.config.js --json > stats.json",
+    "build:stats": "webpack --profile --json > stats.json",
+    "clean": "rimraf build",
+    "prepublishOnly": "$npm_execpath run build",
+    "watch": "webpack --watch"
   },
   "resolutions": {
     "@jupyter/ydoc": "~0.3.1",

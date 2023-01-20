@@ -34,7 +34,7 @@
     "verdaccio.yml"
   ],
   "scripts": {
-    "build": "tsc && cd template && npm run build",
+    "build": "tsc && cd template && $npm_execpath run build",
     "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
     "watch": "tsc -w --listEmittedFiles"
   },
