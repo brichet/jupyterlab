@@ -25,10 +25,10 @@
     "tsconfigtestbase.json"
   ],
   "scripts": {
-    "build": "jlpm run tsc -b",
+    "build": "tsc -b",
     "build:all": "$npm_execpath run build",
-    "clean": "jlpm run rimraf lib && jlpm run rimraf tsconfig.tsbuildinfo",
-    "watch": "jlpm run tsc -b --watch"
+    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
+    "watch": "tsc -b --watch"
   },
   "dependencies": {
     "@jupyterlab/application": "^4.0.0-alpha.18",
