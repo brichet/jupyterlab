@@ -215,8 +215,9 @@ describe('filebrowser/listing', () => {
           itemNode
         ) as HTMLInputElement;
         const item = dirListing.sortedItems().next();
+        const listingUpdated = signalToPromise(dirListing.updated);
         await dirListing.selectItemByName(item.value.name);
-        await signalToPromise(dirListing.updated);
+        await listingUpdated;
         expect(checkbox.checked).toBe(true);
         expect(dirListing.isSelected(item.value.name)).toBe(true);
         simulate(checkbox, 'mousedown', {
