@@ -99,16 +99,6 @@ class LogMarkdownCell extends MarkdownCell {
   }
 }
 
-const server = new JupyterServer();
-
-beforeAll(async () => {
-  await server.start();
-}, 30000);
-
-afterAll(async () => {
-  await server.shutdown();
-});
-
 describe('cells/widget', () => {
   const editorFactory = NBTestUtils.editorFactory;
 
@@ -782,6 +772,16 @@ describe('cells/widget', () => {
 
     describe('.execute()', () => {
       let sessionContext: ISessionContext;
+
+      const server = new JupyterServer();
+
+      beforeAll(async () => {
+        await server.start();
+      }, 30000);
+
+      afterAll(async () => {
+        await server.shutdown();
+      });
 
       beforeEach(async () => {
         sessionContext = await createSessionContext();
