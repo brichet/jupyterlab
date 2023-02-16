@@ -18051,7 +18051,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:~2.5.0":
+"tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:~2.5.0":
   version: 2.5.0
   resolution: "tslib@npm:2.5.0"
   checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
@@ -18616,22 +18616,22 @@ __metadata:
   linkType: hard
 
 "vega-embed@npm:^6.2.1":
-  version: 6.21.2
-  resolution: "vega-embed@npm:6.21.2"
+  version: 6.21.0
+  resolution: "vega-embed@npm:6.21.0"
   dependencies:
     fast-json-patch: ^3.1.1
     json-stringify-pretty-compact: ^3.0.0
-    semver: ^7.3.8
-    tslib: ^2.5.0
+    semver: ^7.3.7
+    tslib: ^2.4.0
     vega-interpreter: ^1.0.4
     vega-schema-url-parser: ^2.2.0
-    vega-themes: ^2.12.1
-    vega-tooltip: ^0.30.1
+    vega-themes: ^2.10.0
+    vega-tooltip: ^0.28.0
     yallist: "*"
   peerDependencies:
     vega: ^5.21.0
     vega-lite: "*"
-  checksum: 37b5a45bf5acf8f4d844edbaa36f6c23ff39ad253de08d49447ccee473b2a57d5a9d4c821fa2a2d53148ed17e849e1184387f9bcfaa07e991f7b5d78ce88f172
+  checksum: dc4634f92906c8499ae94b9c3690c10b50060b1ea8538103412dc57a3930ea35d7f402ec40f0785250e469f6471fbfbc4f8eb6c0479fbb87fed00368112c5058
   languageName: node
   linkType: hard
 
@@ -18891,7 +18891,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vega-themes@npm:^2.12.1":
+"vega-themes@npm:^2.10.0":
   version: 2.12.1
   resolution: "vega-themes@npm:2.12.1"
   peerDependencies:
@@ -18912,12 +18912,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vega-tooltip@npm:^0.30.1":
-  version: 0.30.1
-  resolution: "vega-tooltip@npm:0.30.1"
+"vega-tooltip@npm:^0.28.0":
+  version: 0.28.0
+  resolution: "vega-tooltip@npm:0.28.0"
   dependencies:
     vega-util: ^1.17.0
-  checksum: 427dd60459334716af3c7f13ed5dde1b9643d512b68e1e7ef750f6675f1305e48cce3e57469dc83300d7289035dd3f30953dca541dde98063c4f0937fab60acb
+  checksum: 9610f64b51b2d84b6371c0f9d214ddefa9921d3c555c6c70ab1600ae00222f4cfc5759a910bc3aa0f0a21b9bbd2bd6bfbf5206ec32ddb82d065722768d702edd
   languageName: node
   linkType: hard
 
