@@ -1016,16 +1016,6 @@ function activateNotebookTools(
   const trans = translator.load('jupyterlab');
   const id = 'notebook-tools';
   const notebookTools = new NotebookTools({ tracker, translator });
-  const editorFactory = editorServices.factoryService.newInlineEditor;
-  const cellMetadataEditor = new NotebookTools.CellMetadataEditorTool({
-    editorFactory,
-    collapsed: false,
-    translator
-  });
-  const notebookMetadataEditor = new NotebookTools.NotebookMetadataEditorTool({
-    editorFactory,
-    translator
-  });
 
   // Create message hook for triggers to save to the database.
   const hook = (sender: any, message: Message): boolean => {
@@ -1045,17 +1035,6 @@ function activateNotebookTools(
   notebookTools.title.icon = buildIcon;
   notebookTools.title.caption = trans.__('Notebook Tools');
   notebookTools.id = id;
-
-  notebookTools.addItem({
-    tool: cellMetadataEditor,
-    section: 'advanced',
-    rank: 1
-  });
-  notebookTools.addItem({
-    tool: notebookMetadataEditor,
-    section: 'advanced',
-    rank: 2
-  });
 
   MessageLoop.installMessageHook(notebookTools, hook);
 
