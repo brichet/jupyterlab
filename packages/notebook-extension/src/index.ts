@@ -102,7 +102,6 @@ import { CommandRegistry } from '@lumino/commands';
 import {
   JSONExt,
   JSONObject,
-  JSONValue,
   ReadonlyJSONValue,
   ReadonlyPartialJSONObject,
   UUID
@@ -1017,10 +1016,6 @@ function activateNotebookTools(
   const trans = translator.load('jupyterlab');
   const id = 'notebook-tools';
   const notebookTools = new NotebookTools({ tracker, translator });
-  const activeCellTool = new NotebookTools.ActiveCellTool();
-  const editable = NotebookTools.createEditableToggle(translator);
-  const slideShow = NotebookTools.createSlideShowSelector(translator);
-  const tocBaseNumbering = NotebookTools.createToCBaseNumbering(translator);
   const editorFactory = editorServices.factoryService.newInlineEditor;
   const cellMetadataEditor = new NotebookTools.CellMetadataEditorTool({
     editorFactory,
@@ -1031,8 +1026,6 @@ function activateNotebookTools(
     editorFactory,
     translator
   });
-
-  const services = app.serviceManager;
 
   // Create message hook for triggers to save to the database.
   const hook = (sender: any, message: Message): boolean => {
@@ -1049,55 +1042,9 @@ function activateNotebookTools(
     }
     return true;
   };
-  const optionsMap: { [key: string]: JSONValue } = {};
-  optionsMap.None = null;
-  void services.nbconvert.getExportFormats().then(response => {
-    if (response) {
-      /**
-       * The excluded Cell Inspector Raw NbConvert Formats
-       * (returned from nbconvert's export list)
-       */
-      const rawFormatExclude = [
-        'pdf',
-        'slides',
-        'script',
-        'notebook',
-        'custom'
-      ];
-      let optionValueArray: any = [
-        [trans.__('PDF'), 'pdf'],
-        [trans.__('Slides'), 'slides'],
-        [trans.__('Script'), 'script'],
-        [trans.__('Notebook'), 'notebook'],
-        [trans.__('Custom'), 'custom']
-      ];
-
-      // convert exportList to palette and menu items
-      const formatList = Object.keys(response);
-      const formatLabels = Private.getFormatLabels(translator);
-      formatList.forEach(function (key) {
-        if (rawFormatExclude.indexOf(key) === -1) {
-          const altOption = trans.__(key[0].toUpperCase() + key.substr(1));
-          const option = formatLabels[key] ? formatLabels[key] : altOption;
-          const mimeTypeValue = response[key].output_mimetype;
-          optionValueArray.push([option, mimeTypeValue]);
-        }
-      });
-      const nbConvert = NotebookTools.createNBConvertSelector(
-        optionValueArray,
-        translator
-      );
-      notebookTools.addItem({ tool: nbConvert, section: 'common', rank: 3 });
-    }
-  });
   notebookTools.title.icon = buildIcon;
   notebookTools.title.caption = trans.__('Notebook Tools');
   notebookTools.id = id;
-
-  notebookTools.addItem({ tool: activeCellTool, section: 'common', rank: 1 });
-  notebookTools.addItem({ tool: editable, section: 'common', rank: 2 });
-  notebookTools.addItem({ tool: slideShow, section: 'common', rank: 3 });
-  notebookTools.addItem({ tool: tocBaseNumbering, section: 'common', rank: 4 });
 
   notebookTools.addItem({
     tool: cellMetadataEditor,

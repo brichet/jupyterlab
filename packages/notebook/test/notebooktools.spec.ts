@@ -13,8 +13,9 @@ import {
 import { initNotebookContext } from '@jupyterlab/notebook/lib/testutils';
 import { ObservableJSON } from '@jupyterlab/observables';
 import { JupyterServer, sleep } from '@jupyterlab/testing';
+import { Collapser } from '@jupyterlab/ui-components';
 import { Message } from '@lumino/messaging';
-import { TabPanel, Widget } from '@lumino/widgets';
+import { PanelLayout, TabPanel, Widget } from '@lumino/widgets';
 import { simulate } from 'simulate-event';
 import * as utils from './utils';
 
@@ -101,6 +102,7 @@ afterAll(async () => {
 describe('@jupyterlab/notebook', () => {
   describe('notebooktools', () => {
     let notebookTools: NotebookTools;
+    let sectionName: string;
     let tabpanel: TabPanel;
     let tracker: NotebookTracker;
     let context0: Context<INotebookModel>;
@@ -119,6 +121,8 @@ describe('@jupyterlab/notebook', () => {
       await tracker.add(panel0);
       await tracker.add(panel1);
       notebookTools = new NotebookTools({ tracker });
+      sectionName = 'section';
+      notebookTools.addSection({ sectionName: sectionName });
       tabpanel = new TabPanel();
       tabpanel.addWidget(panel0);
       tabpanel.addWidget(panel1);
@@ -179,11 +183,46 @@ describe('@jupyterlab/notebook', () => {
         });
       });
 
+      describe('#addSection()', () => {
+        it('should add an empty section', () => {
+          const newSectionName = 'newSection';
+          expect(() => {
+            notebookTools.addSection({ sectionName: newSectionName });
+          }).not.toThrow();
+          const currentWidgets = (
+            notebookTools.layout as PanelLayout
+          ).widgets.map(w => {
+            return (w as Collapser).widget;
+          });
+          expect(
+            currentWidgets.filter(w => w.title.label === newSectionName)
+          ).toHaveLength(1);
+        });
+
+        it('should add an section with a widget', () => {
+          const newSectionName = 'newSection';
+          const tool = new NotebookTools.Tool();
+          expect(() => {
+            notebookTools.addSection({ sectionName: newSectionName, tool });
+          }).not.toThrow();
+          const currentWidgets = (
+            notebookTools.layout as PanelLayout
+          ).widgets.map(w => {
+            return (w as Collapser).widget;
+          });
+          const sections = currentWidgets.filter(
+            w => w.title.label === newSectionName
+          );
+          expect(sections).toHaveLength(1);
+          expect((sections[0].layout as PanelLayout).widgets).toContain(tool);
+        });
+      });
+
       describe('#addItem()', () => {
         it('should add a cell tool item', () => {
           const tool = new NotebookTools.Tool();
           expect(() => {
-            notebookTools.addItem({ tool });
+            notebookTools.addItem({ tool, section: sectionName });
           }).not.toThrow();
           tool.dispose();
         });
@@ -191,7 +230,7 @@ describe('@jupyterlab/notebook', () => {
         it('should accept a rank', () => {
           const tool = new NotebookTools.Tool();
           expect(() => {
-            notebookTools.addItem({ tool, rank: 100 });
+            notebookTools.addItem({ tool, section: sectionName, rank: 100 });
           }).not.toThrow();
           tool.dispose();
         });
@@ -209,7 +248,7 @@ describe('@jupyterlab/notebook', () => {
       describe('#parent', () => {
         it('should be the notebooktools object used by the tool', () => {
           const tool = new NotebookTools.Tool({});
-          notebookTools.addItem({ tool });
+          notebookTools.addItem({ tool, section: sectionName });
           expect(tool.notebookTools).toBe(notebookTools);
         });
       });
@@ -217,7 +256,7 @@ describe('@jupyterlab/notebook', () => {
       describe('#onActiveNotebookPanelChanged()', () => {
         it('should be called when the active notebook panel changes', () => {
           const tool = new LogTool({});
-          notebookTools.addItem({ tool });
+          notebookTools.addItem({ tool, section: sectionName });
           tool.methods = [];
           simulate(panel0.node, 'focus');
           expect(tool.methods).toContain('onActiveNotebookPanelChanged');
@@ -227,7 +266,7 @@ describe('@jupyterlab/notebook', () => {
       describe('#onActiveCellChanged()', () => {
         it('should be called when the active cell changes', () => {
           const tool = new LogTool({});
-          notebookTools.addItem({ tool });
+          notebookTools.addItem({ tool, section: sectionName });
           tool.methods = [];
           simulate(panel0.node, 'focus');
           expect(tool.methods).toContain('onActiveCellChanged');
@@ -237,7 +276,7 @@ describe('@jupyterlab/notebook', () => {
       describe('#onSelectionChanged()', () => {
         it('should be called when the selection changes', () => {
           const tool = new LogTool({});
-          notebookTools.addItem({ tool });
+          notebookTools.addItem({ tool, section: sectionName });
           tool.methods = [];
           const current = tracker.currentWidget!;
           current.content.select(current.content.widgets[1]);
@@ -248,7 +287,7 @@ describe('@jupyterlab/notebook', () => {
       describe('#onActiveCellMetadataChanged()', () => {
         it('should be called when the active cell metadata changes', () => {
           const tool = new LogTool({});
-          notebookTools.addItem({ tool });
+          notebookTools.addItem({ tool, section: sectionName });
           tool.methods = [];
           const model = notebookTools.activeCell!.model;
           model.setMetadata('foo', 1);
@@ -260,7 +299,7 @@ describe('@jupyterlab/notebook', () => {
       describe('#onActiveNotebookPanelMetadataChanged()', () => {
         it('should be called when the active notebook panel metadata changes', () => {
           const tool = new LogTool({});
-          notebookTools.addItem({ tool });
+          notebookTools.addItem({ tool, section: sectionName });
           tool.methods = [];
           const model = notebookTools.activeNotebookPanel!.model!;
           model.setMetadata('foo', 1);
@@ -275,13 +314,13 @@ describe('@jupyterlab/notebook', () => {
     describe('NotebookTools.ActiveCellTool', () => {
       it('should create a new active cell tool', () => {
         const tool = new NotebookTools.ActiveCellTool();
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         expect(tool).toBeInstanceOf(NotebookTools.ActiveCellTool);
       });
 
       it('should handle a change to the active cell', () => {
         const tool = new NotebookTools.ActiveCellTool();
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         const widget = tracker.currentWidget!;
         widget.content.activeCellIndex++;
         widget.content.activeCell!.model.setMetadata('bar', 1);
@@ -304,7 +343,7 @@ describe('@jupyterlab/notebook', () => {
         const tool = new NotebookTools.CellMetadataEditorTool({
           editorFactory
         });
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         const model = tool.editor.model;
         expect(JSON.stringify(model.sharedModel.getSource())).toBeTruthy();
         const widget = tracker.currentWidget!;
@@ -319,7 +358,7 @@ describe('@jupyterlab/notebook', () => {
         const tool = new NotebookTools.CellMetadataEditorTool({
           editorFactory
         });
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         const model = tool.editor.model;
         const previous = model.sharedModel.getSource();
         const cellModel = notebookTools.activeCell!.model;
@@ -345,7 +384,7 @@ describe('@jupyterlab/notebook', () => {
         const tool = new NotebookTools.NotebookMetadataEditorTool({
           editorFactory
         });
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         expect(
           JSON.stringify(tool.editor.model.sharedModel.getSource())
         ).toBeTruthy();
@@ -371,7 +410,7 @@ describe('@jupyterlab/notebook', () => {
         const tool = new NotebookTools.NotebookMetadataEditorTool({
           editorFactory
         });
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         const model = tool.editor.model;
         const widget = tracker.currentWidget!;
         expect(JSON.stringify(model.sharedModel.getSource())).not.toContain(
@@ -396,7 +435,7 @@ describe('@jupyterlab/notebook', () => {
             ['baz', [1, 2, 'a']]
           ]
         });
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         simulate(panel0.node, 'focus');
         tabpanel.currentIndex = 2;
       });
@@ -516,7 +555,7 @@ describe('@jupyterlab/notebook', () => {
       it('should create a slide show selector', () => {
         const tool = NotebookTools.createSlideShowSelector();
         tool.selectNode.selectedIndex = -1;
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         simulate(panel0.node, 'focus');
         tabpanel.currentIndex = 2;
         expect(tool).toBeInstanceOf(NotebookTools.KeySelector);
@@ -547,7 +586,7 @@ describe('@jupyterlab/notebook', () => {
         optionValueArray.push(['None', '-']);
         const tool = NotebookTools.createNBConvertSelector(optionValueArray);
         tool.selectNode.selectedIndex = -1;
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         simulate(panel0.node, 'focus');
         NotebookActions.changeCellType(panel0.content, 'raw');
         tabpanel.currentIndex = 2;
@@ -575,7 +614,7 @@ describe('@jupyterlab/notebook', () => {
         ];
         const tool = NotebookTools.createNBConvertSelector(optionValueArray);
         tool.selectNode.selectedIndex = -1;
-        notebookTools.addItem({ tool });
+        notebookTools.addItem({ tool, section: sectionName });
         simulate(panel0.node, 'focus');
         NotebookActions.changeCellType(panel0.content, 'code');
 
