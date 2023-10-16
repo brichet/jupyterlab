@@ -2336,6 +2336,18 @@ export class Notebook extends StaticNotebook {
 
     if (targetArea === 'notebook') {
       this.deselectAll();
+
+      // Prevents the parent element to get the focus.
+      event.preventDefault();
+
+      // Focuses on a cell (if possible), or on the footer element.
+      if (this._activeCell) {
+        this._activeCell.node.focus();
+      } else if (this.widgets.length) {
+        this.widgets[0].node.focus();
+      } else {
+        (this.layout as NotebookWindowedLayout).footer?.node.focus();
+      }
     } else if (targetArea === 'prompt' || targetArea === 'cell') {
       // We don't want to prevent the default selection behavior
       // if there is currently text selected in an output.
