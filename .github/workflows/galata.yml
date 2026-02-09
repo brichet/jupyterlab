@@ -42,7 +42,7 @@ jobs:
             shards: 2
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
@@ -130,7 +130,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
           pattern: galata-blobs-*
@@ -160,7 +160,7 @@ jobs:
 
       - name: Merge and upload test results
         if: ${{ !cancelled() && steps.check-assets.outputs.count > 0 }}
-        uses: actions/upload-artifact/merge@v4
+        uses: actions/upload-artifact/merge@v6
         with:
           # The name matches the pattern so that it is picked again on re-runs
           name: galata-test-assets-merged
@@ -169,7 +169,7 @@ jobs:
 
       - name: Merge blobs and delete individual shards
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact/merge@v4
+        uses: actions/upload-artifact/merge@v6
         with:
           # The name matches the pattern so that it is picked again on re-runs
           name: galata-blobs-merged
@@ -191,12 +191,12 @@ jobs:
         python-version: ['3.10.6']
     steps:
       - name: Checkout JupyterLab
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: core
 
       - name: Checkout demo project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: jupyterlab/jupyterlab-demo
           ref: master
