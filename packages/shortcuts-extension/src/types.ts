@@ -249,8 +249,10 @@ export interface IShortcutUI {
 /**
  * Registry of shortcuts targets.
  */
-export interface IShortcutRegistry
-  extends ReadonlyMap<string, IShortcutTarget> {
+export interface IShortcutRegistry extends ReadonlyMap<
+  string,
+  IShortcutTarget
+> {
   /**
    * Find targets that would conflict with given keys chord under given sequence.
    */
