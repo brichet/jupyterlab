@@ -192,7 +192,7 @@ jobs:
 
       - name: Upload test assets
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: galata-test-assets-${{ matrix.browser }}-${{ matrix.project }}-${{ matrix.shard }}
           path: core/galata/test-results
@@ -200,7 +200,7 @@ jobs:
 
       - name: Upload test report blob
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: galata-blobs-${{ matrix.browser }}-${{ matrix.project }}-${{ matrix.shard }}
           path: core/galata/blob-report
@@ -237,14 +237,14 @@ jobs:
       - name: Download aggregate blob artifact
         if: ${{ github.run_attempt > 1 }}
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: galata-blobs-merged
           path: artifacts/base
 
       - name: Download individual blob artifacts
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: artifacts/overlay
           pattern: galata-blobs-*-*-*
@@ -285,7 +285,7 @@ jobs:
 
       - name: Extract failing and flaky counts
         id: test-counts
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
@@ -296,7 +296,7 @@ jobs:
             core.setOutput('flaky', String(flaky));
 
       - name: Upload merged reports
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: visual-regression-report
           path: playwright-report
@@ -320,7 +320,7 @@ jobs:
 
       - name: Save PR comment data
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
@@ -333,7 +333,7 @@ jobs:
 
       - name: Upload PR comment data
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: galata-pr-comment-data
           path: pr-comment-data.json
@@ -342,7 +342,7 @@ jobs:
       - name: Merge and upload test results
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses: actions/upload-artifact/merge@v6
+        uses: actions/upload-artifact/merge@v7
         with:
           # The name matches the pattern so that it is picked again on re-runs
           name: galata-test-assets-merged
@@ -351,7 +351,7 @@ jobs:
 
       - name: Merge blobs and delete individual shards
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact/merge@v6
+        uses: actions/upload-artifact/merge@v7
         with:
           # The name matches the pattern so that it is picked again on re-runs
           name: galata-blobs-merged
