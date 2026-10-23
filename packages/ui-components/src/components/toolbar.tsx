@@ -16,6 +16,8 @@ import type { ReadonlyJSONObject } from '@lumino/coreutils';
 import type { Message } from '@lumino/messaging';
 import { MessageLoop } from '@lumino/messaging';
 import { AttachedProperty } from '@lumino/properties';
+import type { ISignal } from '@lumino/signaling';
+import { Signal } from '@lumino/signaling';
 import type { Layout } from '@lumino/widgets';
 import { PanelLayout, Widget } from '@lumino/widgets';
 import { Throttler } from '@lumino/polling';
@@ -393,6 +395,7 @@ export class ReactiveToolbar extends Toolbar<Widget> {
     this._resizer = new Throttler(async (callTwice = false) => {
       await this._onResize(callTwice);
     }, 500);
+    this.popupOpener.popupShown.connect(this._onPopupShown, this);
   }
 
   /**
@@ -407,10 +410,45 @@ export class ReactiveToolbar extends Toolbar<Widget> {
       this._resizer.dispose();
     }
 
+    this._widgetObserver.disconnect();
+    Signal.clearData(this);
+
     super.dispose();
   }
 
+  /**
+   * Re-measure widgets held in the popup when it becomes visible, then
+   * trigger an overflow recalculation. While the popup is hidden, its
+   * widgets have no layout (clientWidth is 0), so cached sizes may be
+   * stale after their content changed. The popup-shown moment is the
+   * only reliable opportunity to refresh them.
+   */
+  private async _onPopupShown(): Promise<void> {
+    const opener = this.popupOpener;
+    for (let i = 0; i < opener.widgetCount(); i++) {
+      const widget = opener.widgetAt(i);
+      if (!widget) {
+        continue;
+      }
+      const name = Private.nameProperty.get(widget);
+      if (name) {
+        await this._saveWidgetWidth(name, widget);
+      }
+    }
+    void this._resizer.invoke();
+  }
+
+  protected onChildAdded(msg: Widget.ChildMessage): void {
+    // Observe toolbar items so that any size change invalidates the cached
+    // width and triggers an overflow recalculation. The opener is managed
+    // separately and does not need to be observed.
+    if (!(msg.child instanceof ToolbarPopupOpener)) {
+      this._widgetObserver.observe(msg.child.node);
+    }
+  }
+
   protected onChildRemoved(msg: Widget.ChildMessage): void {
+    this._widgetObserver.unobserve(msg.child.node);
     // If the widget is being moved to the popup opener, keep tracking its
     // intended position so it can be restored to the right slot later.
     // NOTE: we cannot check msg.child.parent here because Lumino fires
@@ -598,6 +636,7 @@ export class ReactiveToolbar extends Toolbar<Widget> {
     if (!(this.parent && this.parent.isAttached)) {
       return;
     }
+    console.log('ON RESIZE TRIGGERED');
     const toolbarWidth = this.node.clientWidth;
     const opener = this.popupOpener;
     const openerWidth = 32;
@@ -761,6 +800,15 @@ export class ReactiveToolbar extends Toolbar<Widget> {
   private readonly _widgetWidths = new Map<string, number>();
   private _widgetPositions = new Map<string, number>();
   private _movingToPopup = new Set<Widget>();
+  private readonly _widgetObserver = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const name = (entry.target as HTMLElement).dataset['jpItemName'];
+      if (name) {
+        this._widgetWidths.delete(name);
+      }
+    }
+    void this._resizer.invoke();
+  });
   // The zoom property is not the real browser zoom, but a value proportional to
   // the zoom, which is modified when the zoom changes.
   private _zoom: number;
@@ -1200,6 +1248,20 @@ class ToolbarPopup extends Widget {
   }
 
   /**
+   * A signal emitted after the popup has been shown.
+   */
+  get shown(): ISignal<this, void> {
+    return this._shown;
+  }
+
+  protected onAfterShow(msg: Message): void {
+    super.onAfterShow(msg);
+    this._shown.emit();
+  }
+
+  private _shown = new Signal<this, void>(this);
+
+  /**
    * Updates the width of the popup, this
    * should match with the toolbar width
    *
@@ -1278,6 +1340,13 @@ class ToolbarPopupOpener extends ToolbarButton {
     this.addClass('jp-Toolbar-responsive-opener');
 
     this.popup = new ToolbarPopup(props.translator);
+  }
+
+  /**
+   * A signal emitted after the popup has been shown.
+   */
+  get popupShown(): ISignal<ToolbarPopup, void> {
+    return this.popup.shown;
   }
 
   /**
