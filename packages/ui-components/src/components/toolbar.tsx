@@ -392,8 +392,8 @@ export class ReactiveToolbar extends Toolbar<Widget> {
     super(options);
     this.insertItem(0, TOOLBAR_OPENER_NAME, this.popupOpener);
     this.popupOpener.hide();
-    this._resizer = new Throttler(async (callTwice = false) => {
-      await this._onResize(callTwice);
+    this._resizer = new Throttler(async () => {
+      await this._onResize();
     }, 500);
     this.popupOpener.popupShown.connect(this._onPopupShown, this);
   }
@@ -576,12 +576,10 @@ export class ReactiveToolbar extends Toolbar<Widget> {
       // Save the new position of the widget.
       this._widgetPositions.set(name, index);
 
-      // Invokes resizing to ensure correct display of items after an addition, only
-      // if the toolbar is rendered. Call the resizer twice (callTwice = true) so that
-      // widgets that have not yet been painted (clientWidth === 0) get a chance to be
-      // rendered before the second pass recalculates the layout.
+      // Invokes resizing to ensure correct display of items after an addition,
+      // only if the toolbar is rendered.
       if (this.isVisible) {
-        void this._resizer.invoke(true);
+        void this._resizer.invoke();
       }
     }
     return status;
@@ -593,7 +591,7 @@ export class ReactiveToolbar extends Toolbar<Widget> {
    * Invokes resizing to ensure correct display of items.
    */
   onAfterShow(msg: Message): void {
-    void this._resizer.stop().then(() => void this._resizer.invoke(true));
+    void this._resizer.stop().then(() => void this._resizer.invoke());
   }
 
   /**
@@ -623,20 +621,11 @@ export class ReactiveToolbar extends Toolbar<Widget> {
   /**
    * Move the toolbar items between the reactive toolbar and the popup toolbar,
    * depending on the width of the toolbar and the width of each item.
-   *
-   * @param callTwice - whether to call the function twice.
-   *
-   * **NOTES**
-   * The `callTwice` parameter is useful when the toolbar is displayed the first time,
-   * because the size of the items is unknown before their first rendering. The first
-   * call will usually add all the items in the main toolbar, and the second call will
-   * reorganize the items between the main toolbar and the popup toolbar.
    */
-  private async _onResize(callTwice = false) {
+  private async _onResize() {
     if (!(this.parent && this.parent.isAttached)) {
       return;
     }
-    console.log('ON RESIZE TRIGGERED');
     const toolbarWidth = this.node.clientWidth;
     const opener = this.popupOpener;
     const openerWidth = 32;
@@ -711,9 +700,6 @@ export class ReactiveToolbar extends Toolbar<Widget> {
           opener.show();
         } else {
           opener.hide();
-        }
-        if (callTwice) {
-          await this._onResize();
         }
       })
       .catch(msg => {
